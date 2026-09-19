@@ -13,5 +13,5 @@ use Illuminate\Support\Facades\Route;
 Route::inertia('/', 'Welcome')->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('dashboard', 'Dashboard')->name('dashboard');
+    Route::inertia('dashboard', 'Dashboard')->name('dashboard'); # dashboard = URL (https://.../dashboard), Dashboard = Vue component, dashboard = nom de la route côté backend
 });

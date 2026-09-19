@@ -12,18 +12,6 @@ pas de `session()`. Une Action reçoit des objets (un `User`, un modèle, un DTO
 C'est ce qui permet d'appeler la même Action depuis un contrôleur, une commande Artisan, un job ou un test
 unitaire, sans rien simuler.
 
-## Comment la logique circule
-
-```
-Route → FormRequest (validation)
-      → Controller (3 à 8 lignes)
-      → Action (orchestration métier, transaction)
-          → Services / ValueObjects (calculs purs)
-          → Models (persistance)
-          → Event (effets de bord : mails, PDF, log)
-      → Inertia::render(props typées depuis un DTO)
-```
-
 ## Ce qu'on ne fait pas
 
 - Pas de Repository tant qu'une requête n'est pas réellement complexe : Eloquent est le domaine.
