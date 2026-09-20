@@ -3,11 +3,9 @@
 namespace Database\Seeders;
 
 use App\Domain\Logement\Models\Logement;
-use App\Domain\Shared\Enums\Role;
 use App\Domain\Shared\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role as RoleModel;
 
 class DatabaseSeeder extends Seeder
 {
@@ -18,10 +16,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        foreach (Role::cases() as $role) {
-            RoleModel::findOrCreate($role->value);
-        }
-
         $bailleur = User::factory()->bailleur()->create([
             'name' => 'Bernard Bailleur',
             'email' => 'bailleur@mini-bail.test',

@@ -15,12 +15,12 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
-use Spatie\Permission\Traits\HasRoles;
 
 /**
  * @property int $id
  * @property string $name
  * @property string $email
+ * @property Role $role
  * @property Carbon|null $email_verified_at
  * @property string $password
  * @property string|null $remember_token
@@ -28,13 +28,13 @@ use Spatie\Permission\Traits\HasRoles;
  * @property Carbon|null $updated_at
  * @property-read Logement|null $logement
  */
-#[Fillable(['name', 'email', 'password'])]
+#[Fillable(['name', 'email', 'password', 'role'])]
 #[Hidden(['password', 'remember_token'])]
 // Implémenter Illuminate\Contracts\Auth\MustVerifyEmail pour rendre la vérification d'e-mail obligatoire.
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, HasRoles, Notifiable;
+    use HasFactory, Notifiable;
 
     /**
      * Get the attributes that should be cast.
@@ -46,17 +46,18 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'role' => Role::class,
         ];
     }
 
     public function estBailleur(): bool
     {
-        return $this->hasRole(Role::Bailleur->value);
+        return $this->role === Role::Bailleur;
     }
 
     public function estLocataire(): bool
     {
-        return $this->hasRole(Role::Locataire->value);
+        return $this->role === Role::Locataire;
     }
 
     /**
