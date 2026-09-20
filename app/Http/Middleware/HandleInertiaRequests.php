@@ -23,7 +23,9 @@ class HandleInertiaRequests extends Middleware
      */
     public function version(Request $request): ?string
     {
-        return parent::version($request);
+        // La version dépend de l'espace : en changeant d'espace, Inertia voit une
+        // version différente et recharge la page entière, donc la bonne entrée Vite.
+        return parent::version($request).'-'.$request->attributes->get('espace', 'app');
     }
 
     /**

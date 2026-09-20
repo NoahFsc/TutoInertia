@@ -4,13 +4,18 @@ declare(strict_types=1);
 
 namespace App\Domain\Shared\Models;
 
+use App\Domain\Logement\Models\Logement;
+use App\Domain\Shared\Enums\Role;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
+use Spatie\Permission\Traits\HasRoles;
 
 /**
  * @property int $id
@@ -21,6 +26,7 @@ use Illuminate\Support\Carbon;
  * @property string|null $remember_token
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property-read Logement|null $logement
  */
 #[Fillable(['name', 'email', 'password'])]
 #[Hidden(['password', 'remember_token'])]
@@ -28,7 +34,7 @@ use Illuminate\Support\Carbon;
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, HasRoles, Notifiable;
 
     /**
      * Get the attributes that should be cast.
@@ -41,6 +47,34 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function estBailleur(): bool
+    {
+        return $this->hasRole(Role::Bailleur->value);
+    }
+
+    public function estLocataire(): bool
+    {
+        return $this->hasRole(Role::Locataire->value);
+    }
+
+    /**
+     * @return HasMany<Logement, $this>
+     */
+    public function logements(): HasMany
+    {
+        return $this->hasMany(Logement::class, 'proprietaire_id');
+    }
+
+    /**
+     * Le logement occupé par ce locataire, s'il en a un.
+     *
+     * @return HasOne<Logement, $this>
+     */
+    public function logement(): HasOne
+    {
+        return $this->hasOne(Logement::class, 'locataire_id');
     }
 
     // Obligatoire ici : le modèle n'est pas dans app/Models,

@@ -1,17 +1,22 @@
 <?php
 
+use App\Http\Controllers\Shared\RedirectionApresConnexionController;
+use App\Http\Middleware\InertiaBailleur;
+use App\Http\Middleware\InertiaLocataire;
 use Illuminate\Support\Facades\Route;
-
-/*
-|--------------------------------------------------------------------------
-| Routes web
-|--------------------------------------------------------------------------
-| Les routes d'authentification (login, register, mot de passe…) sont
-| enregistrées par Fortify : php artisan route:list --only-vendor
-*/
 
 Route::inertia('/', 'Welcome')->name('home');
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('dashboard', 'Dashboard')->name('dashboard'); # dashboard = URL (https://.../dashboard), Dashboard = Vue component, dashboard = nom de la route côté backend
-});
+Route::get('/dashboard', RedirectionApresConnexionController::class)
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
+
+Route::middleware(['auth', 'verified', 'role:bailleur', InertiaBailleur::class])
+    ->prefix('bailleur')
+    ->name('bailleur.')
+    ->group(base_path('routes/bailleur.php'));
+
+Route::middleware(['auth', 'verified', 'role:locataire', InertiaLocataire::class])
+    ->prefix('locataire')
+    ->name('locataire.')
+    ->group(base_path('routes/locataire.php'));

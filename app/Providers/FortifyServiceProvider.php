@@ -11,6 +11,8 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
+use Laravel\Fortify\Contracts\LoginResponse;
+use Laravel\Fortify\Contracts\LogoutResponse;
 use Laravel\Fortify\Features;
 use Laravel\Fortify\Fortify;
 
@@ -21,7 +23,25 @@ class FortifyServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Toujours passer par /dashboard, qui choisit l'espace selon le rôle.
+        // Sans ça, Fortify renvoie vers l'URL demandée avant la connexion,
+        // qui peut être celle de l'autre espace.
+        $this->app->singleton(LoginResponse::class, fn () => new class implements LoginResponse
+        {
+            public function toResponse($request)
+            {
+                return redirect()->route('dashboard');
+            }
+        });
+
+        // Après déconnexion, retour à la page de connexion plutôt qu'à l'accueil public.
+        $this->app->singleton(LogoutResponse::class, fn () => new class implements LogoutResponse
+        {
+            public function toResponse($request)
+            {
+                return redirect()->route('login');
+            }
+        });
     }
 
     /**
